@@ -1,0 +1,90 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Dec 26 00:24:47 2019
+
+@author: Namita
+"""
+#file for augmentation of data
+
+#noise injection
+def noise(data):
+    noise_amp = 0.005*np.random.uniform()*np.amax(data)
+    data = data.astype('float64') + noise_amp * np.random.normal(size=data.shape[0])
+    return data
+
+#time shifting for signals    
+def shift(data):
+    s_range = int(np.random.uniform(low=-5, high = 5)*500)
+    return np.roll(data, s_range)
+ 
+#pitch changes   
+def pitch(data, sample_rate):
+    bins_per_octave = 12
+    pitch_pm = 2
+    pitch_change =  pitch_pm * 2*(np.random.uniform())   
+    data = librosa.effects.pitch_shift(data.astype('float64'), 
+                                      sample_rate, n_steps=pitch_change, 
+                                      bins_per_octave=bins_per_octave)
+    return data
+
+#plotting time series data
+def plot_time_series(data):
+    fig = plt.figure(figsize=(14, 8))
+    plt.title('Raw wave ')
+    plt.ylabel('Amplitude')
+    plt.plot(np.linspace(0, 1, len(data)), data)
+    plt.show()
+    
+X, sample_rate = librosa.load(data2_df.path[216], res_type='kaiser_fast',duration=4,sr=22050*2,offset=0.5)
+plot_time_series(X)
+ipd.Audio(X, rate=sample_rate)
+x = pitch(X, sample_rate)
+plot_time_series(x)
+ipd.Audio(x, rate=sample_rate)
+
+#white noise addition
+syn_data1 = pd.DataFrame(columns=['feature', 'label'])
+for i in tqdm(range(len(data2_df))):
+    X, sample_rate = librosa.load(data2_df.path[i], res_type='kaiser_fast',duration=input_duration,sr=22050*2,offset=0.5)
+    if data2_df.label[i]:
+#     if data2_df.label[i] == "male_positive":
+        X = noise(X)
+        sample_rate = np.array(sample_rate)
+        mfccs = np.mean(librosa.feature.mfcc(y=X, sr=sample_rate, n_mfcc=13), axis=0)
+        feature = mfccs
+        a = random.uniform(0, 1)
+        syn_data1.loc[i] = [feature, data2_df.label[i]]
+        
+
+#pitch tuning
+syn_data2 = pd.DataFrame(columns=['feature', 'label'])
+for i in tqdm(range(len(data2_df))):
+    X, sample_rate = librosa.load(data2_df.path[i], res_type='kaiser_fast',duration=input_duration,sr=22050*2,offset=0.5)
+    if data2_df.label[i]:
+        X = pitch(X, sample_rate)
+        sample_rate = np.array(sample_rate)
+        mfccs = np.mean(librosa.feature.mfcc(y=X, sr=sample_rate, n_mfcc=13), axis=0)
+        feature = mfccs
+        a = random.uniform(0, 1)
+        syn_data2.loc[i] = [feature, data2_df.label[i]]
+
+syn_data1 = syn_data1.reset_index(drop=True)
+syn_data2 = syn_data2.reset_index(drop=True)
+df4 = pd.DataFrame(syn_data1['feature'].values.tolist())
+labels4 = syn_data1.label
+syndf1 = pd.concat([df4,labels4], axis=1)
+syndf1 = syndf1.rename(index=str, columns={"0": "label"})
+syndf1 = syndf1.fillna(0)
+df4 = pd.DataFrame(syn_data2['feature'].values.tolist())
+labels4 = syn_data2.label
+syndf2 = pd.concat([df4,labels4], axis=1)
+syndf2 = syndf2.rename(index=str, columns={"0": "label"})
+syndf2 = syndf2.fillna(0)
+
+#combining the augmented data with original
+combined_df = pd.concat([rnewdf, syndf1, syndf2], ignore_index=True)
+combined_df = combined_df.fillna(0)
+combined_df.head()
+
+
+
