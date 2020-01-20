@@ -1,4 +1,3 @@
-# Voice-sentiment-analysis
 About the data set:
 The dataset used is RAVDESS in which there are two types of data: speech and song from 24 professional actors (12 female, 12 male), vocalizing two lexically-matched statements in a neutral North American accent. 
 Speech includes calm, happy, sad, angry, fearful, surprise, and disgust expressions, and song contains calm, happy, sad, angry, and fearful emotions. 
