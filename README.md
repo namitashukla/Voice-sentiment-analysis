@@ -23,7 +23,7 @@ Our CNN model:
 2. After creating the model, its weights are stored in model.h5 and provided 71.67% test accuracy.
 3. This model is further converted into json file and used for predictions.
 
-Consolidating speech with LinkedIn chat:
+Consolidating speech with chat:
 Based on the emotion of a person analysed through voice, we will provide some suitable suggestions to the sender for further conversation. Also, the sender's emotion will be sent at the receiver end
 for the receiver to understand the mood of the sender and this will help both the sender as well as the receiver to respond further. 
 
